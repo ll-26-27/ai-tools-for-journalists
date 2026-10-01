@@ -4,7 +4,7 @@ AI tools for journalists, from the Bok Center Learning Lab's AI Open Studio (wee
 
 - **`_context/`**: the Markdown the site renders. Every file is a page at the same path (`_context/guides/setup.md` is `/guides/setup`), and every folder is a page showing its `README.md` above a list of what it holds. `_context/README.md` is the home page's intro. Names starting with `_` or `.` are skipped. Frontmatter (all optional): `title`, `description`, `eyebrow`, `updated`, `order`; a folder README can also set `step: 1` (with `subtitle`, `tool`, `tool_title`, `tool_copy`) to appear as a numbered step on the home page.
 - **`_media/`**: gitignored, local only. Captures land here, and anything you drop in shows up on `/live`.
-- **`nextjs/`**: the app.
+- **`nextjs/`**: the app: light only, Inter, with a red accent.
 
 | URL | What |
 | --- | --- |
