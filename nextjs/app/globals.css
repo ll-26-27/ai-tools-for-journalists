@@ -171,14 +171,15 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 
 /* --- home: the tools beside the docs --- */
 .hero-intro { margin-top: 36px; color: var(--muted); }
-.tools { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 0 var(--gutter) clamp(56px, 8vw, 100px); }
+.tools { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 0 var(--gutter) clamp(56px, 8vw, 100px); }
 .tool-card { display: grid; align-content: start; gap: 12px; padding: clamp(22px, 3vw, 32px); border: 1px solid var(--line); border-radius: 18px; background: var(--wash); transition: background .15s; }
 .tool-card:hover { background: var(--hover); }
 .tool-card strong { font-size: clamp(28px, 3vw, 40px); font-weight: 800; letter-spacing: -.05em; line-height: 1; }
 .tool-card:hover strong { color: var(--accent); }
 .tool-card > span:last-child { color: var(--muted); font-size: 15px; line-height: 1.55; }
 .tool-card .eyebrow { color: var(--accent); text-transform: none; letter-spacing: .02em; font-family: ui-monospace, monospace; }
-@media (max-width: 900px) { .tools { grid-template-columns: 1fr; } }
+@media (max-width: 1100px) { .tools { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px) { .tools { grid-template-columns: 1fr; } }
 .site-header nav a[aria-current="page"] { color: var(--accent); }
 .print-link, .inline-link { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 .live-heading code, .live-empty code, .capture-targets code, .empty-state code { padding: .05em .3em; border: 1px solid var(--line); border-radius: 4px; background: var(--code); color: var(--ink); font-family: ui-monospace, monospace; font-size: .86em; }
@@ -266,3 +267,28 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 
 /* Transcriptions run long: keep their line breaks and let them scroll. */
 .capture-description, .live-description { white-space: pre-line; max-height: 16em; overflow-y: auto; }
+
+/* --- clients: the grid, the home-page band, and each client's page --- */
+.wide-shell { width: min(100%, 1400px); margin: 0 auto; padding: 44px var(--gutter) 100px; }
+.client-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 22px; }
+.client-card { display: grid; gap: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--paper); transition: transform .15s, box-shadow .15s; }
+.client-card:hover { transform: translateY(-2px); box-shadow: 0 16px 40px -24px rgba(22, 24, 22, .45); }
+.client-card img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--wash); }
+.client-card-copy { display: grid; gap: 6px; padding: 16px 18px 20px; }
+.client-card-copy strong { font-size: 21px; letter-spacing: -.03em; line-height: 1.15; }
+.client-card:hover strong { color: var(--accent); }
+.client-card-copy > span:last-child { color: var(--muted); font-size: 14px; }
+.home-band { padding: 0 var(--gutter) clamp(56px, 8vw, 100px); }
+.band-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 22px; padding-top: 28px; border-top: 1px solid var(--line); }
+.band-heading h2 { margin: 0; font-size: clamp(30px, 4vw, 48px); letter-spacing: -.05em; }
+.client-hero { margin: 0; background: #111; }
+.client-hero img { display: block; width: 100%; max-height: 78vh; object-fit: contain; margin: 0 auto; }
+.client-hero figcaption { padding: 10px var(--gutter); background: var(--wash); color: var(--muted); font-size: 12px; }
+.client-hero figcaption a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.client-shell { min-height: 0; padding-top: 32px; }
+.client-shell .breadcrumbs { margin-bottom: 36px; }
+.client-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0; margin: 0; border-top: 1px solid var(--line); }
+.client-facts div { padding: 16px 0; border-bottom: 1px solid var(--line); }
+.client-facts dt { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.client-facts dd { margin: 6px 0 0; font-size: 18px; }
+.footer-links { display: inline-flex; gap: 20px; }

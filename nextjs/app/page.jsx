@@ -1,38 +1,25 @@
 import Link from "next/link";
-import { getRoot, site } from "../lib/content.mjs";
+import { getClients } from "../lib/clients.mjs";
+import { getEntry, getRoot, site } from "../lib/content.mjs";
+import ClientGrid from "./components/ClientGrid.jsx";
 import { SiteFooter, SiteHeader } from "./components/Chrome.jsx";
 import Markdown from "./components/Markdown.jsx";
 
-// The tools that sit beside the docs.
-const tools = [
-  { href: "/capture", title: "Capture", copy: "A camera feed and one button: stills of documents, notes, whiteboards, and scenes, each with a description or transcription." },
-  { href: "/live", title: "Live", copy: "Everything captured on this machine, newest first, refreshing on its own." },
-  { href: "/print", title: "Print", copy: "Any page or folder on light paper: put /print in front of its address." },
-];
-
-function ContextMap({ folders }) {
-  return (
-    <ul className="context-map">
-      {folders.map((folder) => (
-        <li key={folder.slug}>
-          <Link href={folder.href} className="context-row">
-            <code>_context/{folder.slug}/</code>
-            <strong>{folder.title}</strong>
-            <span className="context-count">{folder.count} doc{folder.count === 1 ? "" : "s"}</span>
-            {folder.description && <span className="context-note">{folder.description}</span>}
-          </Link>
-          {folder.folders.length > 0 && <ContextMap folders={folder.folders} />}
-        </li>
-      ))}
-    </ul>
-  );
-}
-
+// The home page: the intro from _context/README.md, the four parts of the site, a few clients, and the docs.
 export default async function Home() {
-  const root = await getRoot();
-  // Folders whose README has `step:` in its frontmatter become numbered steps; everything else is in the map.
-  const steps = root.folders.filter((folder) => folder.step).sort((a, b) => a.step - b.step);
-  const docs = root.docs;
+  const [root, docs, shotlist, clients] = await Promise.all([
+    getRoot(),
+    getEntry(["docs"]).then((found) => found?.entry),
+    getEntry(["shotlist"]).then((found) => found?.entry),
+    getClients().catch(() => []),
+  ]);
+  const count = (folder) => folder?.count || 0;
+  const parts = [
+    { href: "/capture", title: "Capture", copy: "The live camera: stills of documents, notes, and scenes, each transcribed or described, landing on this machine." },
+    { href: "/clients", title: "Clients", copy: clients.length ? `${clients.length} clients, read live from a Google Sheet.` : "The client list, read live from a Google Sheet." },
+    { href: "/shotlist", title: "Shot list", copy: shotlist?.description || `What to capture. ${count(shotlist) ? `${count(shotlist)} documents.` : "Coming soon."}` },
+    { href: "/docs", title: "Docs", copy: docs?.description || `Guides and references, from the docs folder. ${count(docs) ? `${count(docs)} documents.` : "Coming soon."}` },
+  ];
 
   return (
     <>
@@ -45,62 +32,45 @@ export default async function Home() {
           {root.content.trim() && <article className="prose hero-intro"><Markdown doc={root} /></article>}
         </section>
 
-        {steps.length > 0 && (
-          <section className="steps" aria-label="Steps">
-            {steps.map((step) => (
-              <article className="step" key={step.slug}>
-                <Link href={step.href} className="step-main">
-                  <span className="step-number">{String(step.step).padStart(2, "0")}</span>
-                  <span className="step-title">{step.title} <span aria-hidden="true">→</span></span>
-                  {step.subtitle && <span className="step-subtitle">{step.subtitle}</span>}
-                  <span className="step-copy">{step.description}</span>
-                </Link>
-                {step.tool && (
-                  <Link href={step.tool} className="step-tool">
-                    <span className="eyebrow">Open the tool</span>
-                    <strong>{step.toolTitle} →</strong>
-                  </Link>
-                )}
-              </article>
-            ))}
-          </section>
-        )}
-
-        <section className="tools" aria-label="Tools">
-          {tools.map((tool) => (
-            <Link href={tool.href} className="tool-card" key={tool.href}>
-              <span className="eyebrow">{tool.href}</span>
-              <strong>{tool.title} <span aria-hidden="true">→</span></strong>
-              <span>{tool.copy}</span>
+        <section className="tools" aria-label="The parts of the site">
+          {parts.map((part) => (
+            <Link href={part.href} className="tool-card" key={part.href}>
+              <span className="eyebrow">{part.href}</span>
+              <strong>{part.title} <span aria-hidden="true">→</span></strong>
+              <span>{part.copy}</span>
             </Link>
           ))}
         </section>
 
-        <section className="home-section" id="docs" aria-labelledby="docs-title">
-          <header className="section-heading">
-            <p className="eyebrow">The docs</p>
-            <h2 id="docs-title">What's in the context</h2>
-            <p>Everything here is Markdown in the repo's <code>_context/</code> folder, the same files Claude reads when you work in the repo. Every folder and document has a page; new files show up on refresh.</p>
-          </header>
-          <div className="ai-body">
-            {root.folders.length > 0 && <ContextMap folders={root.folders} />}
-            {docs.length > 0 && (
-              <ul className="context-map context-docs">
-                {docs.map((doc) => (
-                  <li key={doc.slug}>
-                    <Link href={doc.href} className="context-row">
-                      <code>_context/{doc.slug}.md</code>
-                      <strong>{doc.title}</strong>
-                      <span className="context-count">{doc.eyebrow}</span>
-                      {doc.description && <span className="context-note">{doc.description}</span>}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {root.count === 0 && <p className="empty-state">Nothing here yet. Add a Markdown file to <code>_context/</code>.</p>}
-          </div>
-        </section>
+        {clients.length > 0 && (
+          <section className="home-band" aria-labelledby="clients-title">
+            <header className="band-heading">
+              <h2 id="clients-title">Clients</h2>
+              <Link className="inline-link" href="/clients">All {clients.length} →</Link>
+            </header>
+            <ClientGrid clients={clients.slice(0, 6)} />
+          </section>
+        )}
+
+        {docs && docs.count > 0 && (
+          <section className="home-band" aria-labelledby="docs-title">
+            <header className="band-heading">
+              <h2 id="docs-title">Docs</h2>
+              <Link className="inline-link" href="/docs">All docs →</Link>
+            </header>
+            <ul className="context-map">
+              {[...docs.docs, ...docs.folders].map((item) => (
+                <li key={item.slug}>
+                  <Link href={item.href} className="context-row">
+                    <strong>{item.title}</strong>
+                    <span className="context-count">{item.kind === "folder" ? `${item.count} docs` : item.eyebrow === docs.title ? "" : item.eyebrow}</span>
+                    {item.description && <span className="context-note">{item.description}</span>}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </main>
       <SiteFooter />
     </>
